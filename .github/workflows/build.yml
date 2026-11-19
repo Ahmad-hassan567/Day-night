@@ -5,7 +5,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: unzip -q karachi-sun-moon-android.zip -d proj
+        with: { fetch-depth: 0 }
+      - name: Unzip newest zip
+        run: |
+          best=""; bt=0
+          for f in *.zip; do
+            t=$(git log -1 --format=%ct -- "$f")
+            if [ "$t" -gt "$bt" ]; then bt=$t; best="$f"; fi
+          done
+          echo "Using: $best"
+          unzip -q "$best" -d proj
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 17 }
       - name: Accept Android licenses
